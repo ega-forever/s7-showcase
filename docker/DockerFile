@@ -1,0 +1,18 @@
+FROM ubuntu:16.10
+
+RUN apt-get update -y
+RUN apt-get upgrade -y
+RUN apt-get install software-properties-common wget -y
+#RUN add-apt-repository -y ppa:ethereum/ethereum
+RUN apt-get update -y
+RUN wget https://gethstore.blob.core.windows.net/builds/geth-linux-amd64-1.5.7-da2a22c3.tar.gz
+RUN tar -zxvf geth-linux-amd64-1.5.7-da2a22c3.tar.gz
+RUN ls geth-linux-amd64-1.5.7-da2a22c3
+RUN mkdir /var/geth
+RUN cp geth-linux-amd64-1.5.7-da2a22c3/geth /var/geth/geth
+RUN ln -s /var/geth/geth /usr/local/bin/geth
+COPY genesis.json ./genesis.json
+RUN geth init genesis.json
+COPY pass /root/.ethereum/root_pass
+RUN geth --datadir /home/root/.ethereum --keystore /home/root/.ethereum/keystore --password /root/.ethereum/root_pass account new
+CMD [ "geth", "--rpc", "--rpcport", "8545", "--rpcaddr", "0.0.0.0", "--rpcapi", "personal,eth,web3,net,miner", "--dev", "--mine", "--etherbase", "7df9a875a174b3bc565e6424a0050ebc1b2d1d82", "--datadir", "/home/root/.ethereum", "--keystore", "/home/root/.ethereum/keystore"]
